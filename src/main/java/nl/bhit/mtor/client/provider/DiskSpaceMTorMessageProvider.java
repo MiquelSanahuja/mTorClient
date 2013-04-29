@@ -6,6 +6,7 @@ import nl.bhit.mtor.client.annotation.MTorMessage;
 import nl.bhit.mtor.client.annotation.MTorMessageProvider;
 import nl.bhit.mtor.client.model.ClientMessage;
 import nl.bhit.mtor.client.model.Status;
+import nl.bhit.mtor.client.properties.MTorProperties;
 
 import org.apache.log4j.Logger;
 
@@ -15,11 +16,15 @@ import org.apache.log4j.Logger;
  * @author tibi
  */
 @MTorMessageProvider
-public class DiskSpaceMTorMessageProvider {
+public final class DiskSpaceMTorMessageProvider {
 	private static final transient Logger LOG = Logger.getLogger(DiskSpaceMTorMessageProvider.class);
 
-    private static long errorLimit = 5000000000L;
-    private static long warnLimit = 10000000000L;
+    private static long warnLimit = MTorProperties.getDiskspaceWarnlimit();
+    private static long errorLimit = MTorProperties.getDiskspaceErrorlimit();
+    private static String path = MTorProperties.getDiskspacePath();
+
+    private static final String WARN_MSG = "The hard drive is getting full!";
+    private static final String ERROR_MSG = "The hard drive is full!";
 
     /**
      * this method will return a warning message when the WARN_LIMMI is reached and an error message when the
@@ -32,10 +37,10 @@ public class DiskSpaceMTorMessageProvider {
     	ClientMessage message = new ClientMessage();
         long free = getFreeDiskSpace();
         if (free < errorLimit) {
-            return createMessage(message, "The hard drive is almost full!", Status.ERROR);
+            return createMessage(message, ERROR_MSG, Status.ERROR);
         }
         if (free < warnLimit) {
-            return createMessage(message, "The hard drive is getting full!", Status.WARN);
+            return createMessage(message, WARN_MSG, Status.WARN);
         }
         return null;
     }
@@ -48,15 +53,12 @@ public class DiskSpaceMTorMessageProvider {
     }
 
     protected static long getFreeDiskSpace() {
-        File tmp = new File("/");
+        File tmp = new File(path);
         long free = tmp.getFreeSpace();
         LOG.trace("free disk space is: " + free);
         return free;
     }
 
-    /*
-     * Getters & Setters
-     */
     public static long getErrorLimit() {
         return errorLimit;
     }
@@ -73,4 +75,15 @@ public class DiskSpaceMTorMessageProvider {
     	DiskSpaceMTorMessageProvider.warnLimit = warnLimit;
     }
 
+	public static String getPath() {
+		return path;
+	}
+
+	public static void setPath(String path) {
+		DiskSpaceMTorMessageProvider.path = path;
+	}
+
+    private DiskSpaceMTorMessageProvider() {
+    }
+    
 }

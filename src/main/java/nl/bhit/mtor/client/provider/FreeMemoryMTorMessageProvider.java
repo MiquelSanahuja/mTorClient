@@ -4,19 +4,19 @@ import nl.bhit.mtor.client.annotation.MTorMessage;
 import nl.bhit.mtor.client.annotation.MTorMessageProvider;
 import nl.bhit.mtor.client.model.ClientMessage;
 import nl.bhit.mtor.client.model.Status;
+import nl.bhit.mtor.client.properties.MTorProperties;
 
 import org.apache.log4j.Logger;
 
 @MTorMessageProvider
-public class FreeMemoryMTorMessageProvider {
+public final class FreeMemoryMTorMessageProvider {
 	private static final transient Logger LOG = Logger.getLogger(FreeMemoryMTorMessageProvider.class);
     
-    public static long warnLimit = 150 /*MB*/ * 1024 /*KB x MB*/ * 1024 /*Byte x KB*/;
-    public static long errorLimit = 50 /*MB*/ * 1024 /*KB x MB*/ * 1024 /*Byte x KB*/;
+    private static long warnLimit = MTorProperties.getFreememoryWarnlimit();
+    private static long errorLimit = MTorProperties.getFreememoryErrorlimit();
     
-    private static final String ERROR_MSG = "The free memory is less then " + errorLimit + "!";
-    private static final String WARN_MSG = "The free memory is less then " + warnLimit + "! It is running low.";
-
+    private static final String WARN_MSG = "The free memory is running low.";
+    private static final String ERROR_MSG = "The free memory is too low!";
 
     /**
      * this method will return a warning message when the WARN_LIMIT is reached and an error message when the
@@ -63,4 +63,6 @@ public class FreeMemoryMTorMessageProvider {
 		FreeMemoryMTorMessageProvider.errorLimit = errorLimit;
 	}
 
+	private FreeMemoryMTorMessageProvider() {
+	}
 }

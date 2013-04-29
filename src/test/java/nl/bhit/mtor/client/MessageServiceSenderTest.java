@@ -6,6 +6,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import nl.bhit.mtor.client.model.ClientMessage;
+import nl.bhit.mtor.client.properties.MTorProperties;
 import nl.bhit.mtor.client.util.RestUtil;
 
 import org.apache.log4j.Logger;
@@ -32,15 +33,15 @@ public class MessageServiceSenderTest extends TestCase {
 
     @Test
     public void testGetBasePackages() {
-        Set<String> result = client.getBasePackages();
+        Set<String> result = MTorProperties.getPackages();
         Assert.assertEquals(1, result.size());
     }
     
     @Test
     public void testGetMessages() {
-    	String url = client.getServerUrl() + "/services/api/messages/-1.json";
+    	String url = MTorProperties.getServerUrlBase() + "/services/api/messages/-1.json";
     	try {
-			List<ClientMessage> clientMessages = RestUtil.getObjectsFromServer(ClientMessage[].class, url, client.getServerUsername(), client.getServerPassword());
+			List<ClientMessage> clientMessages = RestUtil.getObjectsFromServer(ClientMessage[].class, url, MTorProperties.getServerUsername(), MTorProperties.getServerPassword());
 			Assert.assertTrue(clientMessages.size() > 0);
 		} catch (RestClientException e) {
 			LOG.info("Getting textmessages test failed because of RestClientException: " + e.getMessage());
@@ -48,4 +49,5 @@ public class MessageServiceSenderTest extends TestCase {
 			LOG.info("Getting textmessages test failed because of a General Exception: " + e.getMessage());
 		}
     }
+    
 }
